@@ -117,6 +117,15 @@ $ java -jar build/libs/ksar-<version>-all.jar
 
 The tests are run with `./gradlew test`.
 
+Releases
+--------
+
+When the Test workflow succeeds on `master`, the Auto Release workflow
+(`.github/workflows/auto-release.yml`) publishes a GitHub release named after the version in
+`gradle.properties` (for example `v6.1.0-jp`) with the `ksar-<version>-all.jar` attached. If a
+release for that version already exists nothing is published, so to make a new release raise the
+version in `gradle.properties` and merge it to `master`.
+
 Acknowledgements
 ----------------
 

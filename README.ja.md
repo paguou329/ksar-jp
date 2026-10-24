@@ -121,6 +121,15 @@ $ java -jar build/libs/ksar-<バージョン>-all.jar
 
 テストは `./gradlew test` で実行します。
 
+リリース
+--------
+
+`master` で Test ワークフローが成功すると、Auto Release ワークフロー
+(`.github/workflows/auto-release.yml`) が、`gradle.properties` のバージョン (例: `v6.1.0-jp`)
+の名前で GitHub リリースを作成し、`ksar-<バージョン>-all.jar` を添付します。そのバージョンの
+リリースが既にある場合は何もしません。新しいリリースを作るには、`gradle.properties`
+のバージョンを上げて `master` にマージしてください。
+
 謝辞
 ----
 
