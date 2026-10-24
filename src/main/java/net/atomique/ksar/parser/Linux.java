@@ -5,6 +5,8 @@
 
 package net.atomique.ksar.parser;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.Config;
 import net.atomique.ksar.GlobalOptions;
 import net.atomique.ksar.OSParser;
@@ -29,6 +31,13 @@ public class Linux extends OSParser {
   private String LinuxDateFormat;
   private DateTimeFormatter formatter;
 
+  // time stamps of sar run with a Japanese locale, e.g. "13時05分09秒"
+  private static final String JAPANESE_TIME_FORMAT = "HH時mm分ss秒";
+  private static final DateTimeFormatter JAPANESE_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern(JAPANESE_TIME_FORMAT);
+  private static final java.util.regex.Pattern JAPANESE_TIME =
+      java.util.regex.Pattern.compile("^\\d{2}時\\d{2}分\\d{2}秒$");
+
   // https://translationproject.org/domain/sysstat.html
   // https://github.com/sysstat/sysstat/tree/master/nls
   // look for - msgid "Average:" && msgid "Summary:"
@@ -37,7 +46,8 @@ public class Linux extends OSParser {
       "Average:", "Summary:", "Summary",              // en.po
       "Moyenne :", "Moyenne?:", "Résumé:",        // fr.po (ANSI,UTF-8)
       "Durchschn.:", "Zusammenfassung:",              // de.po
-      "Media:", "Resumen:"                            // es.po
+      "Media:", "Resumen:",                           // es.po
+      "平均値:", "平均:", "サマリ:", "概要:"             // ja.po
   ));
 
   public void parseHeader(String s) {
@@ -89,7 +99,7 @@ public class Linux extends OSParser {
     log.trace("askDateFormat - provide date format");
     if (GlobalOptions.hasUI()) {
       LinuxDateFormat tmp = new LinuxDateFormat(GlobalOptions.getUI(), true);
-      tmp.setTitle("Provide date format");
+      tmp.setTitle(tr("linuxformat.provide"));
       if (tmp.isOk()) {
         LinuxDateFormat = tmp.getDateFormat();
         if (tmp.hasToRemenber()) {
@@ -134,7 +144,10 @@ public class Linux extends OSParser {
       if (timeColumn == 2) {
         parsetime = LocalTime.parse(columns[0] + " " + columns[1], formatter);
       } else {
-        parsetime = LocalTime.parse(columns[0], formatter);
+        // a Japanese-locale sar may print the date in Japanese but the time with colons, or
+        // both in Japanese, so the notation is decided per line
+        parsetime = LocalTime.parse(columns[0],
+            JAPANESE_TIME.matcher(columns[0]).matches() ? JAPANESE_TIME_FORMATTER : formatter);
       }
 
       LocalDateTime nowStat;

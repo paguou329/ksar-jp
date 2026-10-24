@@ -5,6 +5,8 @@
 
 package net.atomique.ksar;
 
+import static net.atomique.ksar.I18n.tr;
+
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.JSch;
@@ -93,7 +95,7 @@ public class SSHCommand extends Thread {
     dialog.setModalityType(java.awt.Dialog.ModalityType.DOCUMENT_MODAL);
 
     titleLabel.setFont(new java.awt.Font("Tahoma", Font.BOLD, 14));
-    titleLabel.setText("SSH Connection");
+    titleLabel.setText(tr("ssh.title"));
     headerpanel.add(titleLabel);
 
     dialog.getContentPane().add(headerpanel, java.awt.BorderLayout.PAGE_START);
@@ -104,7 +106,7 @@ public class SSHCommand extends Thread {
     hostnamePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
     HostnameLabel.setLabelFor(HostComboBox);
-    HostnameLabel.setText("User@Host");
+    HostnameLabel.setText(tr("ssh.userhost"));
     hostnamePanel.add(HostnameLabel);
 
     HostComboBox.setEditable(true);
@@ -124,7 +126,7 @@ public class SSHCommand extends Thread {
     passwordPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
     PasswordLabel.setLabelFor(PasswordField);
-    PasswordLabel.setText("Password");
+    PasswordLabel.setText(tr("ssh.password"));
     PasswordLabel.setPreferredSize(new java.awt.Dimension(69, 16));
     passwordPanel.add(PasswordLabel);
 
@@ -137,7 +139,7 @@ public class SSHCommand extends Thread {
     commandPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
     ComboBoxLabel.setLabelFor(commandComboBox);
-    ComboBoxLabel.setText("Command");
+    ComboBoxLabel.setText(tr("ssh.command"));
     ComboBoxLabel.setPreferredSize(new java.awt.Dimension(69, 16));
     commandPanel.add(ComboBoxLabel);
 
@@ -150,7 +152,7 @@ public class SSHCommand extends Thread {
 
     dialog.getContentPane().add(infopanel, java.awt.BorderLayout.CENTER);
 
-    Cancelbutton.setText("Cancel");
+    Cancelbutton.setText(tr("common.cancel"));
     Cancelbutton.addActionListener(new java.awt.event.ActionListener() {
 
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,7 +161,7 @@ public class SSHCommand extends Thread {
     });
     buttonpanel.add(Cancelbutton);
 
-    ConnectionButton.setText("Connection");
+    ConnectionButton.setText(tr("ssh.connect"));
     ConnectionButton.addActionListener(new java.awt.event.ActionListener() {
 
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -227,7 +229,7 @@ public class SSHCommand extends Thread {
       session.connect();
     } catch (JSchException ex) {
       if (GlobalOptions.hasUI()) {
-        JOptionPane.showMessageDialog(GlobalOptions.getUI(), "Unable to connect", "SSH error",
+        JOptionPane.showMessageDialog(GlobalOptions.getUI(), tr("ssh.error.connect"), tr("ssh.error.title"),
             JOptionPane.ERROR_MESSAGE);
         mysar.cleared();
       } else {
@@ -239,7 +241,7 @@ public class SSHCommand extends Thread {
       channel = session.openChannel("exec");
     } catch (JSchException ex) {
       if (GlobalOptions.hasUI()) {
-        JOptionPane.showMessageDialog(GlobalOptions.getUI(), "Unable to open Channel", "SSH error",
+        JOptionPane.showMessageDialog(GlobalOptions.getUI(), tr("ssh.error.channel"), tr("ssh.error.title"),
             JOptionPane.ERROR_MESSAGE);
         mysar.cleared();
       } else {
@@ -257,7 +259,7 @@ public class SSHCommand extends Thread {
       err = ((ChannelExec) channel).getErrStream();
     } catch (IOException ex) {
       if (GlobalOptions.hasUI()) {
-        JOptionPane.showMessageDialog(GlobalOptions.getUI(), "Unable to open pipe", "SSH error",
+        JOptionPane.showMessageDialog(GlobalOptions.getUI(), tr("ssh.error.pipe"), tr("ssh.error.title"),
             JOptionPane.ERROR_MESSAGE);
         mysar.cleared();
       } else {
@@ -269,8 +271,8 @@ public class SSHCommand extends Thread {
       channel.connect();
     } catch (JSchException ex) {
       if (GlobalOptions.hasUI()) {
-        JOptionPane.showMessageDialog(GlobalOptions.getUI(), "Unable to connect Channel",
-            "SSH error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(GlobalOptions.getUI(), tr("ssh.error.connectchannel"),
+            tr("ssh.error.title"), JOptionPane.ERROR_MESSAGE);
         mysar.cleared();
       } else {
         log.error("Err: unable to connect Channel");
@@ -282,7 +284,7 @@ public class SSHCommand extends Thread {
       if (channel.getExitStatus() != 0) {
         if (GlobalOptions.hasUI()) {
           JOptionPane.showMessageDialog(GlobalOptions.getUI(),
-              "There was a problem while retrieving stat", "SSH error", JOptionPane.ERROR_MESSAGE);
+              tr("ssh.error.stat"), tr("ssh.error.title"), JOptionPane.ERROR_MESSAGE);
           mysar.cleared();
         } else {
           log.error("Err: Problem during ssh connection");
@@ -329,7 +331,7 @@ public class SSHCommand extends Thread {
       }
       if (tmpmessage.length() > 0) {
         if (GlobalOptions.hasUI()) {
-          JOptionPane.showMessageDialog(GlobalOptions.getUI(), tmpmessage.toString(), "SSH error",
+          JOptionPane.showMessageDialog(GlobalOptions.getUI(), tmpmessage.toString(), tr("ssh.error.title"),
               JOptionPane.ERROR_MESSAGE);
         }
       }
@@ -356,9 +358,9 @@ public class SSHCommand extends Thread {
 
     public boolean promptYesNo(String str) {
 
-      String[] options = {"yes", "no"};
+      String[] options = {tr("ssh.yes"), tr("ssh.no")};
       if (GlobalOptions.hasUI()) {
-        int foo = JOptionPane.showOptionDialog(GlobalOptions.getUI(), str, "Warning",
+        int foo = JOptionPane.showOptionDialog(GlobalOptions.getUI(), str, tr("ssh.warning"),
             JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]);
         return foo == 0;
       } else {

@@ -47,6 +47,8 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
+    // Keep ksar.properties and ksar-profiles written by the tests out of the working directory
+    systemProperty("ksar.config.dir", layout.buildDirectory.dir("test-config").get().asFile.path)
     // The CI matrix (see .github/workflows/matrix.mjs) injects per-job JVM options such as
     // the test locale and JIT-stress flags here, so they reach the test workers without
     // affecting the Gradle daemon. Arguments are separated with " ::: " because a single

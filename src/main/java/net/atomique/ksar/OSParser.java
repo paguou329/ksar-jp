@@ -5,6 +5,8 @@
 
 package net.atomique.ksar;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.xml.OSConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,39 +85,39 @@ public abstract class OSParser extends AllParser {
 
   public String getInfo() {
     StringBuilder tmpstr = new StringBuilder();
-    tmpstr.append("OS Type: ").append(ostype);
+    tmpstr.append(tr("os.type", ostype));
     if (OSversion != null) {
-      tmpstr.append("OS Version: ").append(OSversion).append("\n");
+      tmpstr.append(tr("os.version", OSversion)).append("\n");
     }
     if (Kernel != null) {
-      tmpstr.append("Kernel Release: ").append(Kernel).append("\n");
+      tmpstr.append(tr("os.kernel", Kernel)).append("\n");
     }
     if (CpuType != null) {
-      tmpstr.append("CPU Type: ").append(CpuType).append("\n");
+      tmpstr.append(tr("os.cpu", CpuType)).append("\n");
     }
     if (Hostname != null) {
-      tmpstr.append("Hostname: ").append(Hostname).append("\n");
+      tmpstr.append(tr("os.hostname", Hostname)).append("\n");
     }
     if (MacAddress != null) {
-      tmpstr.append("Mac Address: ").append(MacAddress).append("\n");
+      tmpstr.append(tr("os.mac", MacAddress)).append("\n");
     }
     if (Memory != null) {
-      tmpstr.append("Memory: ").append(Memory).append("\n");
+      tmpstr.append(tr("os.memory", Memory)).append("\n");
     }
     if (NBDisk != null) {
-      tmpstr.append("Number of disks: ").append(NBDisk).append("\n");
+      tmpstr.append(tr("os.disks", NBDisk)).append("\n");
     }
     if (NBCpu != null) {
-      tmpstr.append("Number of CPU: ").append(NBCpu).append("\n");
+      tmpstr.append(tr("os.cpus", NBCpu)).append("\n");
     }
     if (ENT != null) {
-      tmpstr.append("Ent: ").append(ENT).append("\n");
+      tmpstr.append(tr("os.ent", ENT)).append("\n");
     }
     if (sarStartDate != null) {
-      tmpstr.append("Start of SAR: ").append(sarStartDate).append("\n");
+      tmpstr.append(tr("os.start", sarStartDate)).append("\n");
     }
     if (sarEndDate != null) {
-      tmpstr.append("End of SAR: ").append(sarEndDate).append("\n");
+      tmpstr.append(tr("os.end", sarEndDate)).append("\n");
     }
 
     tmpstr.append("\n");
@@ -162,7 +164,7 @@ public abstract class OSParser extends AllParser {
 
       if (asFormattedDateTimeStart != null && asFormattedDateTimeEnd != null) {
         mysar.getDataView()
-            .setTitle(String.format("%s from %s to %s", Hostname, asFormattedDateTimeStart,
+            .setTitle(tr("os.title", Hostname, asFormattedDateTimeStart,
                 asFormattedDateTimeEnd));
       }
     }

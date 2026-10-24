@@ -5,6 +5,8 @@
 
 package net.atomique.ksar;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.xml.OSConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,6 +161,17 @@ public abstract class AllParser {
       format = determineDateFormat(s);
     } else {
       format = DateTimeFormatter.ofPattern(dateFormat);
+      try {
+        LocalDate.parse(s, format);
+      } catch (DateTimeParseException ex) {
+        // The configured format does not fit this file (e.g. a stored Japanese format meets an
+        // ISO date), so detect it instead of failing every line of the file.
+        log.warn("date {} does not match format {}, detecting the format", s, dateFormat);
+        DateTimeFormatter detected = determineDateFormat(s);
+        if (detected != null) {
+          format = detected;
+        }
+      }
     }
     dateFormatter = format;
     return dateFormatter;
@@ -168,7 +181,7 @@ public abstract class AllParser {
     if (sarStartDate.equals(sarEndDate)) {
       return sarStartDate;
     } else {
-      return sarStartDate + " to " + sarEndDate;
+      return tr("date.range", sarStartDate, sarEndDate);
     }
   }
 

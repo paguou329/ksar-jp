@@ -5,6 +5,8 @@
 
 package net.atomique.ksar.ui;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.Config;
 import net.atomique.ksar.GlobalOptions;
 import net.atomique.ksar.export.FileCSV;
@@ -111,6 +113,7 @@ public class DataView extends javax.swing.JInternalFrame {
       }
     });
     jScrollPane1.setViewportView(jTree1);
+    ScrollSpeed.apply(jScrollPane1);
 
     jPanel2.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
@@ -131,9 +134,9 @@ public class DataView extends javax.swing.JInternalFrame {
 
     getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-    dataMenu.setText("Data");
+    dataMenu.setText(tr("data.menu"));
 
-    LoadFile.setText("Load from a file...");
+    LoadFile.setText(tr("data.load.file"));
     LoadFile.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         LoadFileActionPerformed(evt);
@@ -141,7 +144,7 @@ public class DataView extends javax.swing.JInternalFrame {
     });
     dataMenu.add(LoadFile);
 
-    LoadCommand.setText("Load from a local Command...");
+    LoadCommand.setText(tr("data.load.command"));
     LoadCommand.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         LoadCommandActionPerformed(evt);
@@ -149,7 +152,7 @@ public class DataView extends javax.swing.JInternalFrame {
     });
     dataMenu.add(LoadCommand);
 
-    LoadSSH.setText("Load from a SSH Command...");
+    LoadSSH.setText(tr("data.load.ssh"));
     LoadSSH.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         LoadSSHActionPerformed(evt);
@@ -159,10 +162,10 @@ public class DataView extends javax.swing.JInternalFrame {
 
     jMenuBar1.add(dataMenu);
 
-    GraphMenu.setText("Graph");
+    GraphMenu.setText(tr("data.graph"));
     GraphMenu.setEnabled(false);
 
-    addgraphMenu.setText("Add a Graph");
+    addgraphMenu.setText(tr("data.graph.add"));
     addgraphMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         addgraphMenuActionPerformed(evt);
@@ -172,10 +175,10 @@ public class DataView extends javax.swing.JInternalFrame {
 
     jMenuBar1.add(GraphMenu);
 
-    exportMenu.setText("Export");
+    exportMenu.setText(tr("data.export"));
     exportMenu.setEnabled(false);
 
-    PDFMenu.setText("Export to PDF...");
+    PDFMenu.setText(tr("data.export.pdf"));
     PDFMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         PDFMenuActionPerformed(evt);
@@ -183,7 +186,7 @@ public class DataView extends javax.swing.JInternalFrame {
     });
     exportMenu.add(PDFMenu);
 
-    CSVMenu.setText("Export to CSV...");
+    CSVMenu.setText(tr("data.export.csv"));
     CSVMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         CSVMenuActionPerformed(evt);
@@ -278,7 +281,7 @@ public class DataView extends javax.swing.JInternalFrame {
       return;
     }
     tmp = null;
-    String filename = askSaveFilename("Export PDF", Config.getLastExportDirectory());
+    String filename = askSaveFilename(tr("data.export.pdf.title"), Config.getLastExportDirectory());
     if (filename == null) {
       return;
     }
@@ -299,7 +302,7 @@ public class DataView extends javax.swing.JInternalFrame {
       return;
 
     }
-    String filename = askSaveFilename("Export CSV", Config.getLastExportDirectory());
+    String filename = askSaveFilename(tr("data.export.csv.title"), Config.getLastExportDirectory());
     if (filename == null) {
       return;
     }
@@ -340,9 +343,9 @@ public class DataView extends javax.swing.JInternalFrame {
     }
 
     if (new File(filename).exists()) {
-      String[] choix = {"Yes", "No"};
+      String[] choix = {tr("common.yes"), tr("common.no")};
       int resultat =
-          JOptionPane.showOptionDialog(null, "Overwrite " + filename + " ?", "File Exist",
+          JOptionPane.showOptionDialog(null, tr("file.overwrite.message", filename), tr("file.overwrite.title"),
               JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, choix,
               choix[1]);
       if (resultat != 0) {
@@ -362,7 +365,7 @@ public class DataView extends javax.swing.JInternalFrame {
     pbar.setMinimum(0);
     pbar.setMaximum(pages);
     pbar.setStringPainted(true);
-    JLabel mytitre = new JLabel("Exporting: ");
+    JLabel mytitre = new JLabel(tr("data.exporting"));
     panel1.add(mytitre);
     panel2.add(pbar);
     panel0.add(panel1);
@@ -391,7 +394,7 @@ public class DataView extends javax.swing.JInternalFrame {
     pbar.setMinimum(0);
     pbar.setMaximum(pages);
     pbar.setStringPainted(true);
-    JLabel mytitre = new JLabel("Exporting: ");
+    JLabel mytitre = new JLabel(tr("data.exporting"));
     panel1.add(mytitre);
     panel2.add(pbar);
     panel0.add(panel1);
@@ -460,7 +463,7 @@ public class DataView extends javax.swing.JInternalFrame {
     exportMenu.setEnabled(!t);
     dataMenu.setEnabled(!t);
     if (t) {
-      jButton1.setText("Stop");
+      jButton1.setText(tr("data.stop"));
       jButton1.setEnabled(true);
     } else {
       jButton1.setText("");
@@ -472,13 +475,13 @@ public class DataView extends javax.swing.JInternalFrame {
     has_fresh_data = actif;
     exportMenu.setEnabled(actif);
     if (actif) {
-      LoadFile.setText("Append from a file...");
-      LoadCommand.setText("Append from a local Command...");
-      LoadSSH.setText("Append from a SSH Command...");
+      LoadFile.setText(tr("data.append.file"));
+      LoadCommand.setText(tr("data.append.command"));
+      LoadSSH.setText(tr("data.append.ssh"));
     } else {
-      LoadFile.setText("Load from a file...");
-      LoadCommand.setText("Load from a local Command...");
-      LoadSSH.setText("Load from a SSH Command...");
+      LoadFile.setText(tr("data.load.file"));
+      LoadCommand.setText(tr("data.load.command"));
+      LoadSSH.setText(tr("data.load.ssh"));
     }
   }
 

@@ -5,11 +5,19 @@
 
 package net.atomique.ksar.ui;
 
+import static net.atomique.ksar.I18n.tr;
+
 import java.awt.Component;
+import java.awt.Container;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Consumer;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
-public class GraphSelection extends javax.swing.JDialog {
+public class GraphSelection extends javax.swing.JDialog
+    implements ExportProfilePanel.GraphSelectionView {
 
   /**
    * Creates new form GraphSelection
@@ -48,12 +56,15 @@ public class GraphSelection extends javax.swing.JDialog {
 
     jPanel3.setLayout(new javax.swing.BoxLayout(jPanel3, javax.swing.BoxLayout.PAGE_AXIS));
     jScrollPane1.setViewportView(jPanel3);
+    ScrollSpeed.apply(jScrollPane1);
 
     jPanel1.add(jScrollPane1, java.awt.BorderLayout.CENTER);
 
     getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-    selectallButton.setText("Select All");
+    getContentPane().add(exportSettings, java.awt.BorderLayout.NORTH);
+
+    selectallButton.setText(tr("graphselection.selectall"));
     selectallButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         selectallButtonActionPerformed(evt);
@@ -61,7 +72,7 @@ public class GraphSelection extends javax.swing.JDialog {
     });
     jPanel2.add(selectallButton);
 
-    unselectallButton.setText("Unselect All");
+    unselectallButton.setText(tr("graphselection.unselectall"));
     unselectallButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         unselectallButtonActionPerformed(evt);
@@ -72,7 +83,7 @@ public class GraphSelection extends javax.swing.JDialog {
     jSeparator2.setOrientation(javax.swing.SwingConstants.VERTICAL);
     jPanel2.add(jSeparator2);
 
-    cancelButton.setText("Cancel");
+    cancelButton.setText(tr("common.cancel"));
     cancelButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         cancelButtonActionPerformed(evt);
@@ -80,7 +91,7 @@ public class GraphSelection extends javax.swing.JDialog {
     });
     jPanel2.add(cancelButton);
 
-    okButton.setText("Ok");
+    okButton.setText(tr("common.ok"));
     okButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         okButtonActionPerformed(evt);
@@ -100,6 +111,7 @@ public class GraphSelection extends javax.swing.JDialog {
 
   private void okButtonActionPerformed(
       java.awt.event.ActionEvent evt) {
+    exportSettings.applyToConfig();
     this.dispose();
     OkforExport = true;
   }
@@ -129,6 +141,40 @@ public class GraphSelection extends javax.swing.JDialog {
     }
   }
 
+  @Override
+  public void setVisible(boolean visible) {
+    if (visible) {
+      exportSettings.applyRememberedSelection();
+    }
+    super.setVisible(visible);
+  }
+
+  @Override
+  public List<String> excludedGraphTitles() {
+    List<String> excluded = new ArrayList<>();
+    forEachCheckBox(jPanel3, box -> {
+      if (!box.isSelected()) {
+        excluded.add(box.getText());
+      }
+    });
+    return excluded;
+  }
+
+  @Override
+  public void applyExcludedGraphs(Collection<String> excluded) {
+    forEachCheckBox(jPanel3, box -> box.setSelected(!excluded.contains(box.getText())));
+  }
+
+  private static void forEachCheckBox(Container container, Consumer<JCheckBox> action) {
+    for (Component component : container.getComponents()) {
+      if (component instanceof JCheckBox) {
+        action.accept((JCheckBox) component);
+      } else if (component instanceof Container) {
+        forEachCheckBox((Container) component, action);
+      }
+    }
+  }
+
   public void addPrintCheckBox(JCheckBox tmp) {
     jPanel3.add(tmp);
     jPanel1.validate();
@@ -148,6 +194,7 @@ public class GraphSelection extends javax.swing.JDialog {
   private javax.swing.JButton okButton;
   private javax.swing.JButton selectallButton;
   private javax.swing.JButton unselectallButton;
+  private final ExportProfilePanel exportSettings = new ExportProfilePanel(this);
   private DataView myview = null;
   public boolean OkforExport = false;
 }

@@ -85,4 +85,70 @@ public class LinuxHeaderTest {
     assertEquals(LocalDateTime.of(2023, 12, 31, 9, 10, 1), sut.getEndOfGraph());
   }
 
+  @Test
+  public void parsesJapaneseDateAndTimeWithAutomaticDetection() {
+    Config.setLinuxDateFormat("Automatic Detection");
+    Linux sut = new Linux();
+    String stat =
+        "09時10分01秒          6      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00";
+
+    sut.init(new kSar(), "Linux 3.10.0-327.el7.x86_64 (host)  2016年03月28日  _x86_64_  (48 CPU)");
+    sut.parse(stat, stat.split("\\s+"));
+
+    assertEquals(LocalDateTime.of(2016, 3, 28, 9, 10, 1), sut.getStartOfGraph());
+  }
+
+  @Test
+  public void parsesJapaneseDateAndTimeWithExplicitFormat() {
+    Config.setLinuxDateFormat("YYYY年MM月DD日 12時59分59秒");
+    Linux sut = new Linux();
+    String stat =
+        "09時10分01秒          6      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00    100.00";
+
+    sut.init(new kSar(), "Linux 3.10.0-327.el7.x86_64 (host)  2016年03月28日  _x86_64_  (48 CPU)");
+    sut.parse(stat, stat.split("\\s+"));
+
+    assertEquals(LocalDateTime.of(2016, 3, 28, 9, 10, 1), sut.getStartOfGraph());
+  }
+
+  @Test
+  public void parsesColonTimeWithJapaneseDateAndExplicitFormat() {
+    Config.setLinuxDateFormat("YYYY年MM月DD日 12時59分59秒");
+    Linux sut = new Linux();
+    String stat =
+        "23:59:01          1     21.04      0.00      0.00      0.00      0.00";
+
+    sut.init(new kSar(), "Linux 3.10.0-327.el7.x86_64 (host)  2016年03月28日  _x86_64_  (48 CPU)");
+    sut.parse(stat, stat.split("\\s+"));
+
+    assertEquals(LocalDateTime.of(2016, 3, 28, 23, 59, 1), sut.getStartOfGraph());
+  }
+
+  @Test
+  public void parsesColonTimeWithJapaneseDateAfterJapaneseTime() {
+    Config.setLinuxDateFormat("Automatic Detection");
+    Linux sut = new Linux();
+    String jaTime = "09時10分01秒          6      0.00      0.00";
+    String colonTime = "23:59:01          6      0.00      0.00";
+
+    sut.init(new kSar(), "Linux 3.10.0-327.el7.x86_64 (host)  2016年03月28日  _x86_64_  (48 CPU)");
+    sut.parse(jaTime, jaTime.split("\\s+"));
+    sut.parse(colonTime, colonTime.split("\\s+"));
+
+    assertEquals(LocalDateTime.of(2016, 3, 28, 9, 10, 1), sut.getStartOfGraph());
+    assertEquals(LocalDateTime.of(2016, 3, 28, 23, 59, 1), sut.getEndOfGraph());
+  }
+
+  @Test
+  public void fallsBackToAutomaticDetectionWhenExplicitDateFormatDoesNotMatch() {
+    Config.setLinuxDateFormat("YYYY年MM月DD日 12時59分59秒");
+    Linux sut = new Linux();
+    String stat = "18:17:01          3     11.07      0.00      0.00      0.00      0.00";
+
+    sut.init(new kSar(), "Linux 4.18.0-553.169.1.el8_10.x86_64 (host) 	2026-10-02 	_x86_64_	(4 CPU)");
+    sut.parse(stat, stat.split("\s+"));
+
+    assertEquals(LocalDateTime.of(2026, 10, 2, 18, 17, 1), sut.getStartOfGraph());
+  }
+
 }

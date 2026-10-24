@@ -13,17 +13,43 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Properties;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
 import javax.swing.UIManager;
 
+/**
+ * The user settings. They are kept in {@code ksar.properties} in the current directory (or in the
+ * directory named by the {@code ksar.config.dir} system property), export profiles in the
+ * {@code ksar-profiles} directory next to it.
+ */
 public class Config {
 
   private static final Logger log = LoggerFactory.getLogger(GlobalOptions.class);
 
-  private static Preferences myPref;
+  private static final String CONFIG_FILE_NAME = "ksar.properties";
+  private static final String PROFILE_DIRECTORY_NAME = "ksar-profiles";
+
+  // The fields below must be declared before "instance": creating it loads the settings into
+  // them, and a later initializer would overwrite what was loaded.
+  private static String landf;
+  private static File lastReadDirectory;
+  private static File lastExportDirectory;
+  private static String lastCommand;
+  private static int local_configfile = -1;
+  private static ArrayList<String> host_history = new ArrayList<>();
+  private static final Font DEFAULT_FONT = new Font("SansSerif", Font.BOLD, 18);
+
+  private static String LinuxDateFormat;
+  private static String PDFPageFormat;
+  private static String PDFFontFile = "";
+  private static String exportProfileName = "";
+  private static int ImageWidth;
+  private static int ImageHeight;
+
   private static Config instance = new Config();
 
   static Config getInstance() {
@@ -34,66 +60,113 @@ public class Config {
 
     log.trace("load Config");
 
-    myPref = Preferences.userNodeForPackage(Config.class);
-    if (myPref.getInt("local_configfile", -1) == -1) {
-      // new
-      try {
-        myPref.clear();
-        myPref.flush();
-      } catch (BackingStoreException e) {
-        log.error("BackingStoreException", e);
-      }
+    boolean known = load(getConfigFile());
+    if (!known || local_configfile == -1) {
+      // first start
       local_configfile = store_configdir();
-      myPref.putInt("local_configfile", local_configfile);
-
+      save();
     }
-    load();
   }
 
-  private static void load() {
-    /*
-    * load default value or stored value
-    */
-    setLandf(myPref.get("landf", UIManager.getLookAndFeel().getName()));
-    setLastReadDirectory(myPref.get("lastReadDirectory", null));
-    setLastExportDirectory(myPref.get("lastExportDirectory", null));
+  /**
+   * Returns the directory holding the settings file and the profile directory.
+   */
+  static File getConfigDirectory() {
+    String dir = System.getProperty("ksar.config.dir");
+    return new File(dir != null && !dir.isEmpty() ? dir : System.getProperty("user.dir"));
+  }
 
-    setImageHeight(myPref.getInt("ImageHeight", 600));
-    setImageWidth(myPref.getInt("ImageWidth", 800));
-    setPDFPageFormat(myPref.get("PDFPageFormat", "A4"));
-    setLinuxDateFormat(myPref.get("LinuxDateFormat", "Always ask"));
+  static File getConfigFile() {
+    return new File(getConfigDirectory(), CONFIG_FILE_NAME);
+  }
 
-    setNumber_host_history(myPref.getInt("HostHistory", 0));
-    for (int i = 0; i < getNumber_host_history(); i++) {
-      host_history.add(myPref.get("HostHistory_" + i, null));
+  /**
+   * Loads the settings from {@code file}; settings that are not stored get their default value.
+   *
+   * @return whether the file existed and could be read
+   */
+  static boolean load(File file) {
+    Properties props = new Properties();
+    boolean read = false;
+    if (file.isFile()) {
+      try (Reader in = Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8)) {
+        props.load(in);
+        read = true;
+      } catch (IOException | IllegalArgumentException e) {
+        log.error("Unable to read {}", file, e);
+      }
     }
-    setLocal_configfile(myPref.getInt("local_configfile", -1));
+
+    setLandf(props.getProperty("landf", UIManager.getLookAndFeel().getName()));
+    setLastReadDirectory(props.getProperty("lastReadDirectory"));
+    setLastExportDirectory(props.getProperty("lastExportDirectory"));
+
+    setImageHeight(getInt(props, "ImageHeight", 600));
+    setImageWidth(getInt(props, "ImageWidth", 800));
+    setPDFPageFormat(props.getProperty("PDFPageFormat", "A4"));
+    setPDFFontFile(props.getProperty("PDFFontFile", ""));
+    setExportProfileName(props.getProperty("ExportProfile", ""));
+    setLinuxDateFormat(props.getProperty("LinuxDateFormat", "Always ask"));
+
+    host_history.clear();
+    int count = getInt(props, "HostHistory", 0);
+    for (int i = 0; i < count; i++) {
+      String host = props.getProperty("HostHistory_" + i);
+      if (host != null) {
+        host_history.add(host);
+      }
+    }
+    setLocal_configfile(getInt(props, "local_configfile", -1));
+    return read;
   }
 
   public static void save() {
-    if (myPref == null) {
-      return;
-    }
-    myPref.put("landf", landf);
+    saveTo(getConfigFile());
+  }
+
+  static void saveTo(File file) {
+    Properties props = new Properties();
+    props.setProperty("landf", landf);
     if (lastReadDirectory != null) {
-      myPref.put("lastReadDirectory", lastReadDirectory.toString());
+      props.setProperty("lastReadDirectory", lastReadDirectory.toString());
     }
     if (lastExportDirectory != null) {
-      myPref.put("lastExportDirectory", lastExportDirectory.toString());
+      props.setProperty("lastExportDirectory", lastExportDirectory.toString());
     }
 
-    myPref.putInt("ImageHeight", ImageHeight);
-    myPref.putInt("ImageWidth", ImageWidth);
-    myPref.put("PDFPageFormat", PDFPageFormat);
-    myPref.put("LinuxDateFormat", LinuxDateFormat);
+    props.setProperty("ImageHeight", Integer.toString(ImageHeight));
+    props.setProperty("ImageWidth", Integer.toString(ImageWidth));
+    props.setProperty("PDFPageFormat", PDFPageFormat);
+    props.setProperty("PDFFontFile", PDFFontFile);
+    props.setProperty("ExportProfile", exportProfileName);
+    props.setProperty("LinuxDateFormat", LinuxDateFormat);
 
     for (int i = 0; i < host_history.size(); i++) {
-      myPref.put("HostHistory_" + i, host_history.get(i));
+      props.setProperty("HostHistory_" + i, host_history.get(i));
     }
-    myPref.putInt("HostHistory", host_history.size());
+    props.setProperty("HostHistory", Integer.toString(host_history.size()));
 
-    myPref.putInt("local_configfile", local_configfile);
+    props.setProperty("local_configfile", Integer.toString(local_configfile));
 
+    try {
+      File parent = file.getAbsoluteFile().getParentFile();
+      if (parent != null) {
+        Files.createDirectories(parent.toPath());
+      }
+      try (Writer out = Files.newBufferedWriter(file.toPath(), StandardCharsets.UTF_8)) {
+        props.store(out, "kSar settings");
+      }
+    } catch (IOException e) {
+      log.error("Unable to write {}", file, e);
+    }
+  }
+
+  private static int getInt(Properties props, String key, int defaultValue) {
+    try {
+      return Integer.parseInt(props.getProperty(key, "").trim());
+    } catch (NumberFormatException e) {
+      return defaultValue;
+    }
   }
 
   public static String getLandf() {
@@ -148,14 +221,6 @@ public class Config {
     host_history.add(e);
   }
 
-  private static int getNumber_host_history() {
-    return number_host_history;
-  }
-
-  private static void setNumber_host_history(int number_host_history) {
-    Config.number_host_history = number_host_history;
-  }
-
   public static Font getDEFAULT_FONT() {
     return DEFAULT_FONT;
   }
@@ -176,6 +241,18 @@ public class Config {
     Config.ImageWidth = ImageWidth;
   }
 
+  /**
+   * Returns the font file (TTF/OTF/TTC) used for PDF export, or an empty string for the built-in
+   * font.
+   */
+  public static String getPDFFontFile() {
+    return PDFFontFile;
+  }
+
+  public static void setPDFFontFile(String PDFFontFile) {
+    Config.PDFFontFile = PDFFontFile == null ? "" : PDFFontFile.trim();
+  }
+
   public static String getPDFPageFormat() {
     return PDFPageFormat;
   }
@@ -184,13 +261,38 @@ public class Config {
     Config.PDFPageFormat = PDFPageFormat;
   }
 
+  /**
+   * Returns the store of the export profiles.
+   */
+  public static ExportProfileStore getExportProfileStore() {
+    return new ExportProfileStore(new File(getConfigDirectory(), PROFILE_DIRECTORY_NAME));
+  }
+
+  /**
+   * Returns the name of the export profile last chosen, or an empty string for none.
+   */
+  public static String getExportProfileName() {
+    return exportProfileName;
+  }
+
+  public static void setExportProfileName(String exportProfileName) {
+    Config.exportProfileName = exportProfileName == null ? "" : exportProfileName;
+  }
+
+  /**
+   * Makes the settings of {@code profile} the current export settings.
+   */
+  public static void applyExportProfile(ExportProfile profile) {
+    setImageWidth(profile.imageWidth());
+    setImageHeight(profile.imageHeight());
+    setPDFPageFormat(profile.pdfPageFormat());
+    setPDFFontFile(profile.pdfFontFile());
+    setExportProfileName(profile.name());
+  }
 
   private static int store_configdir() {
-    Properties systemprops = System.getProperties();
-    String userhome = (String) systemprops.get("user.home") + systemprops.get("file.separator");
-    String username = (String) systemprops.get("user.name");
-    String fileseparator = (String) systemprops.get("file.separator");
-    // mkdir userhome/.ksar
+    String userhome = System.getProperty("user.home") + File.separator;
+    // mkdir userhome/.ksarcfg
     String buffer = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n\n<ConfiG>\n</ConfiG>\n";
     boolean home = new File(userhome + ".ksarcfg").mkdir();
     if (!home) {
@@ -200,7 +302,7 @@ public class Config {
     BufferedWriter out;
     try {
       out =
-          new BufferedWriter(new FileWriter(userhome + ".ksarcfg" + fileseparator + "Config.xml"));
+          new BufferedWriter(new FileWriter(userhome + ".ksarcfg" + File.separator + "Config.xml"));
       out.write(buffer);
       out.flush();
       out.close();
@@ -226,20 +328,5 @@ public class Config {
   public static void setLinuxDateFormat(String LinuxDateFormat) {
     Config.LinuxDateFormat = LinuxDateFormat;
   }
-
-
-  private static String landf;
-  private static File lastReadDirectory;
-  private static File lastExportDirectory;
-  private static String lastCommand;
-  private static int number_host_history;
-  private static int local_configfile;
-  private static ArrayList<String> host_history = new ArrayList<>();
-  private static final Font DEFAULT_FONT = new Font("SansSerif", Font.BOLD, 18);
-
-  private static String LinuxDateFormat;
-  private static String PDFPageFormat;
-  private static int ImageWidth;
-  private static int ImageHeight;
 
 }

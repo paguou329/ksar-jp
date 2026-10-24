@@ -8,6 +8,8 @@ package net.atomique.ksar.export;
 import static com.itextpdf.text.FontFactory.COURIER;
 import static com.itextpdf.text.FontFactory.getFont;
 
+import com.itextpdf.awt.DefaultFontMapper;
+import com.itextpdf.awt.FontMapper;
 import com.itextpdf.awt.PdfGraphics2D;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
@@ -39,6 +41,7 @@ import java.awt.geom.Rectangle2D.Double;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 import javax.swing.JDialog;
 import javax.swing.JProgressBar;
 
@@ -90,6 +93,7 @@ public class FilePDF extends PdfPageEventHelper implements Runnable {
 
       writer.setPageEvent(this);
       writer.setCompressionLevel(0);
+      applyConfiguredFont();
 
       // document parameter before open
       document.addTitle("kSar Grapher");
@@ -190,11 +194,43 @@ public class FilePDF extends PdfPageEventHelper implements Runnable {
     }
   }
 
+  /**
+   * Switches to the font chosen in the preferences, if any. A TrueType/OpenType file is embedded
+   * so that text such as Japanese host names renders; on failure the built-in font is kept.
+   */
+  private void applyConfiguredFont() {
+    String path = Config.getPDFFontFile();
+    if (path.isEmpty()) {
+      return;
+    }
+    // iText selects a face of a font collection with a ",index" suffix
+    if (path.toLowerCase(Locale.ROOT).endsWith(".ttc")) {
+      path += ",0";
+    }
+    try {
+      final BaseFont custom = BaseFont.createFont(path, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+      bf = custom;
+      fontMapper = new FontMapper() {
+        @Override
+        public BaseFont awtToPdf(java.awt.Font font) {
+          return custom;
+        }
+
+        @Override
+        public java.awt.Font pdfToAwt(BaseFont font, int size) {
+          return null;
+        }
+      };
+    } catch (DocumentException | IOException e) {
+      log.error("Unable to use PDF font {}, falling back to the default font", path, e);
+    }
+  }
+
   private void addchart(PdfWriter writer, Graph graph) {
     JFreeChart chart =
         graph.getgraph(mysar.myparser.getStartOfGraph(), mysar.myparser.getEndOfGraph());
     PdfTemplate pdftpl = pdfcb.createTemplate(pagewidth, pageheight);
-    Graphics2D g2d = new PdfGraphics2D(pdftpl, pagewidth, pageheight);
+    Graphics2D g2d = new PdfGraphics2D(pdftpl, pagewidth, pageheight, fontMapper);
     Double r2d = new Rectangle2D.Double(0, 0, pagewidth, pageheight);
     chart.draw(g2d, r2d);
     g2d.dispose();
@@ -251,6 +287,7 @@ public class FilePDF extends PdfPageEventHelper implements Runnable {
   private PdfContentByte pdfcb;
   private kSar mysar;
   private BaseFont bf = getFont(COURIER).getCalculatedBaseFont(false);
+  private FontMapper fontMapper = new DefaultFontMapper();
   private JProgressBar progress_bar = null;
   private JDialog dialog = null;
 }

@@ -5,6 +5,8 @@
 
 package net.atomique.ksar.ui;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.kSar;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -174,7 +176,7 @@ public class Desktop extends javax.swing.JFrame {
     AboutMenu = new javax.swing.JMenuItem();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-    setTitle("kSar : a sar grapher");
+    setTitle(tr("app.title"));
     addWindowListener(new java.awt.event.WindowAdapter() {
       public void windowClosing(java.awt.event.WindowEvent evt) {
         formWindowClosing(evt);
@@ -182,9 +184,9 @@ public class Desktop extends javax.swing.JFrame {
     });
     getContentPane().add(DesktopPane, java.awt.BorderLayout.CENTER);
 
-    FileMenu.setText("File"); // NOI18N
+    FileMenu.setText(tr("menu.file")); // NOI18N
 
-    NewMenu.setText("New window");
+    NewMenu.setText(tr("menu.file.new"));
     NewMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         NewMenuActionPerformed(evt);
@@ -192,7 +194,7 @@ public class Desktop extends javax.swing.JFrame {
     });
     FileMenu.add(NewMenu);
 
-    QuitMenu.setText("Quit");
+    QuitMenu.setText(tr("menu.file.quit"));
     QuitMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         QuitMenuActionPerformed(evt);
@@ -202,9 +204,9 @@ public class Desktop extends javax.swing.JFrame {
 
     MenuBar.add(FileMenu);
 
-    OptionsMenu.setText("Options"); // NOI18N
+    OptionsMenu.setText(tr("menu.options")); // NOI18N
 
-    SysprefMenu.setText("System Preferences");
+    SysprefMenu.setText(tr("menu.options.preferences"));
     SysprefMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         SysprefMenuActionPerformed(evt);
@@ -214,9 +216,9 @@ public class Desktop extends javax.swing.JFrame {
 
     MenuBar.add(OptionsMenu);
 
-    WindowMenu.setText("Window");
+    WindowMenu.setText(tr("menu.window"));
 
-    TileMenu.setText("Tile");
+    TileMenu.setText(tr("menu.window.tile"));
     TileMenu.setActionCommand("TileMenu");
     TileMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -225,7 +227,7 @@ public class Desktop extends javax.swing.JFrame {
     });
     WindowMenu.add(TileMenu);
 
-    IconifyMenu.setText("Iconify");
+    IconifyMenu.setText(tr("menu.window.iconify"));
     IconifyMenu.setActionCommand("IconifyMenu");
     IconifyMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -234,7 +236,7 @@ public class Desktop extends javax.swing.JFrame {
     });
     WindowMenu.add(IconifyMenu);
 
-    MaximizeMenu.setText("Maximize");
+    MaximizeMenu.setText(tr("menu.window.maximize"));
     MaximizeMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         MaximizeMenuActionPerformed(evt);
@@ -246,7 +248,7 @@ public class Desktop extends javax.swing.JFrame {
 
     HelpMenu.setText("?");
 
-    AboutMenu.setText("About");
+    AboutMenu.setText(tr("menu.help.about"));
     AboutMenu.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         AboutMenuActionPerformed(evt);
@@ -311,7 +313,7 @@ public class Desktop extends javax.swing.JFrame {
 
 
   private void tryToQuit() {
-    int i = JOptionPane.showConfirmDialog(this, "Are you sure you want to exit kSar ?", "Confirm",
+    int i = JOptionPane.showConfirmDialog(this, tr("quit.message"), tr("quit.title"),
         JOptionPane.YES_NO_OPTION);
     if (i == JOptionPane.YES_OPTION) {
       System.exit(0);

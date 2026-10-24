@@ -5,6 +5,8 @@
 
 package net.atomique.ksar;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.graph.Graph;
 import net.atomique.ksar.ui.DataView;
 import net.atomique.ksar.ui.SortedTreeNode;
@@ -26,7 +28,7 @@ public class kSar {
     dataview = new DataView(this);
     dataview.toFront();
     dataview.setVisible(true);
-    dataview.setTitle("Empty");
+    dataview.setTitle(tr("data.title.empty"));
     DesktopPane.add(dataview);
     try {
       int num = DesktopPane.getAllFrames().length;
@@ -84,6 +86,7 @@ public class kSar {
       log.info("action is null");
       return;
     }
+    action_interrupted = false;
     if (launched_action != null) {
       if (dataview != null) {
         dataview.notifyrun(true);
@@ -92,7 +95,20 @@ public class kSar {
     }
   }
 
+  /**
+   * Parses one stream and then updates the UI.
+   */
   public int parse(BufferedReader br) {
+    int result = parseStream(br);
+    finishParsing();
+    return result;
+  }
+
+  /**
+   * Parses one stream without touching the UI state, so that several streams can be read one
+   * after the other and appended to the same data. Call {@link #finishParsing()} afterwards.
+   */
+  int parseStream(BufferedReader br) {
     String current_line;
     long parsing_start;
     long parsing_end;
@@ -178,12 +194,6 @@ public class kSar {
       Parsing = false;
     }
 
-    if (dataview != null) {
-      dataview.treehome();
-      dataview.notifyrun(false);
-      dataview.setHasData(true);
-    }
-
     parsing_end = System.currentTimeMillis();
     log.debug("time to parse: {} ms", (parsing_end - parsing_start));
     log.debug("lines parsed: {}", lines_parsed);
@@ -192,6 +202,24 @@ public class kSar {
     }
     Parsing = false;
     return -1;
+  }
+
+  /**
+   * Shows the parsed data and makes the menus usable again.
+   */
+  void finishParsing() {
+    if (dataview != null) {
+      dataview.treehome();
+      dataview.notifyrun(false);
+      dataview.setHasData(true);
+    }
+  }
+
+  /**
+   * Tells whether the user asked to stop the running action.
+   */
+  boolean isInterrupted() {
+    return action_interrupted;
   }
 
   void cleared() {

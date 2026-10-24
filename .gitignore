@@ -29,3 +29,7 @@ node_modules/
 
 # NetBeans GUI-builder source files, no longer used
 *.form
+
+# Local kSar settings and export profiles
+ksar.properties
+ksar-profiles/

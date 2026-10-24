@@ -5,6 +5,8 @@
 
 package net.atomique.ksar.ui;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.GlobalOptions;
 import net.atomique.ksar.xml.HostInfo;
 
@@ -50,7 +52,7 @@ public class HostInfoView extends javax.swing.JDialog {
     OkButton = new javax.swing.JButton();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
-    setTitle("Host Information");
+    setTitle(tr("hostinfo.title"));
 
     jPanel1.setBorder(javax.swing.BorderFactory.createEmptyBorder(5, 5, 5, 5));
     jPanel1.setLayout(new javax.swing.BoxLayout(jPanel1, javax.swing.BoxLayout.PAGE_AXIS));
@@ -58,17 +60,17 @@ public class HostInfoView extends javax.swing.JDialog {
     hostnamePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
     HostNameLabel.setLabelFor(Hostname);
-    HostNameLabel.setText("Hostname:");
+    HostNameLabel.setText(tr("hostinfo.hostname"));
     hostnamePanel.add(HostNameLabel);
 
-    Hostname.setText("hostname");
+    Hostname.setText(tr("hostinfo.hostname.placeholder"));
     hostnamePanel.add(Hostname);
 
     jPanel1.add(hostnamePanel);
 
     AliasPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-    AliasLabel.setText("Alias");
+    AliasLabel.setText(tr("hostinfo.alias"));
     AliasLabel.setPreferredSize(new java.awt.Dimension(52, 14));
     AliasPanel.add(AliasLabel);
 
@@ -81,7 +83,7 @@ public class HostInfoView extends javax.swing.JDialog {
     DescriptionPanel.setLayout(
         new javax.swing.BoxLayout(DescriptionPanel, javax.swing.BoxLayout.PAGE_AXIS));
 
-    descriptionLabel.setText("Description");
+    descriptionLabel.setText(tr("hostinfo.description"));
     descriptionLabel.setPreferredSize(new java.awt.Dimension(52, 14));
     DescriptionPanel.add(descriptionLabel);
 
@@ -91,6 +93,7 @@ public class HostInfoView extends javax.swing.JDialog {
     jTextArea1.setRows(5);
     jTextArea1.setPreferredSize(new java.awt.Dimension(300, 200));
     jScrollPane1.setViewportView(jTextArea1);
+    ScrollSpeed.apply(jScrollPane1);
 
     DescriptionPanel.add(jScrollPane1);
 
@@ -98,7 +101,7 @@ public class HostInfoView extends javax.swing.JDialog {
 
     MemoryPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-    memBlockSizeLabel.setText("Memory Block Size:");
+    memBlockSizeLabel.setText(tr("hostinfo.memblocksize"));
     MemoryPanel.add(memBlockSizeLabel);
 
     memboxcombo.setModel(new javax.swing.DefaultComboBoxModel(
@@ -111,7 +114,7 @@ public class HostInfoView extends javax.swing.JDialog {
 
     jPanel2.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.CENTER, 15, 5));
 
-    OkButton.setText("Ok");
+    OkButton.setText(tr("common.ok"));
     OkButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         OkButtonActionPerformed(evt);

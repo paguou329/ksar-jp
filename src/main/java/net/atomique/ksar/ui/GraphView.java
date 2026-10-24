@@ -5,6 +5,8 @@
 
 package net.atomique.ksar.ui;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.Config;
 import net.atomique.ksar.GlobalOptions;
 import net.atomique.ksar.graph.Graph;
@@ -61,7 +63,7 @@ public class GraphView extends javax.swing.JPanel {
     graphPanel.setLayout(new java.awt.BorderLayout());
     add(graphPanel, java.awt.BorderLayout.CENTER);
 
-    csvButton.setText("Export CSV");
+    csvButton.setText(tr("graph.export.csv"));
     csvButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         csvButtonActionPerformed(evt);
@@ -69,7 +71,7 @@ public class GraphView extends javax.swing.JPanel {
     });
     buttonPanel.add(csvButton);
 
-    jpgBuitton.setText("Export JPG");
+    jpgBuitton.setText(tr("graph.export.jpg"));
     jpgBuitton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         jpgBuittonActionPerformed(evt);
@@ -77,7 +79,7 @@ public class GraphView extends javax.swing.JPanel {
     });
     buttonPanel.add(jpgBuitton);
 
-    pngButton.setText("Export PNG");
+    pngButton.setText(tr("graph.export.png"));
     pngButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         pngButtonActionPerformed(evt);
@@ -85,7 +87,7 @@ public class GraphView extends javax.swing.JPanel {
     });
     buttonPanel.add(pngButton);
 
-    ctrlcButton.setText("Copy");
+    ctrlcButton.setText(tr("graph.copy"));
     ctrlcButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         ctrlcButtonActionPerformed(evt);
@@ -93,7 +95,7 @@ public class GraphView extends javax.swing.JPanel {
     });
     buttonPanel.add(ctrlcButton);
 
-    printButton.setText("Print");
+    printButton.setText(tr("graph.print"));
     printButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         printButtonActionPerformed(evt);
@@ -109,7 +111,7 @@ public class GraphView extends javax.swing.JPanel {
     String filename;
     String buffer;
 
-    filename = askSaveFilename("Export CSV", Config.getLastExportDirectory());
+    filename = askSaveFilename(tr("data.export.csv.title"), Config.getLastExportDirectory());
 
     if (filename == null) {
       return;
@@ -146,7 +148,7 @@ public class GraphView extends javax.swing.JPanel {
 
   private void jpgBuittonActionPerformed(
       java.awt.event.ActionEvent evt) {
-    String filename = askSaveFilename("Export JPG", Config.getLastExportDirectory());
+    String filename = askSaveFilename(tr("data.export.jpg.title"), Config.getLastExportDirectory());
     if (filename == null) {
       return;
     }
@@ -165,7 +167,7 @@ public class GraphView extends javax.swing.JPanel {
 
   private void pngButtonActionPerformed(
       java.awt.event.ActionEvent evt) {
-    String filename = askSaveFilename("Export PNG", Config.getLastExportDirectory());
+    String filename = askSaveFilename(tr("data.export.png.title"), Config.getLastExportDirectory());
     if (filename == null) {
       return;
     }
@@ -190,9 +192,9 @@ public class GraphView extends javax.swing.JPanel {
     }
 
     if (new File(filename).exists()) {
-      String[] choix = {"Yes", "No"};
+      String[] choix = {tr("common.yes"), tr("common.no")};
       int resultat =
-          JOptionPane.showOptionDialog(null, "Overwrite " + filename + " ?", "File Exist",
+          JOptionPane.showOptionDialog(null, tr("file.overwrite.message", filename), tr("file.overwrite.title"),
               JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, choix,
               choix[1]);
       if (resultat != 0) {

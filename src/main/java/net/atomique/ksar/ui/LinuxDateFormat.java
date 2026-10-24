@@ -5,6 +5,8 @@
 
 package net.atomique.ksar.ui;
 
+import static net.atomique.ksar.I18n.tr;
+
 import javax.swing.DefaultComboBoxModel;
 
 public class LinuxDateFormat extends javax.swing.JDialog {
@@ -24,17 +26,8 @@ public class LinuxDateFormat extends javax.swing.JDialog {
   }
 
   private void load_linuxformat() {
-    LinuxFormatComboModel.addElement("Automatic Detection");
-    LinuxFormatComboModel.addElement("MM/DD/YY 23:59:59");
-    LinuxFormatComboModel.addElement("MM/DD/YYYY 23:59:59");
-    LinuxFormatComboModel.addElement("DD/MM/YY 23:59:59");
-    LinuxFormatComboModel.addElement("DD/MM/YYYY 23:59:59");
-    LinuxFormatComboModel.addElement("YYYY-MM-DD 23:59:59");
-    LinuxFormatComboModel.addElement("MM/DD/YY 12:59:59 AM|PM");
-    LinuxFormatComboModel.addElement("MM/DD/YYYY 12:59:59 AM|PM");
-    LinuxFormatComboModel.addElement("DD/MM/YY 12:59:59 AM|PM");
-    LinuxFormatComboModel.addElement("DD/MM/YYYY 12:59:59 AM|PM");
-    LinuxFormatComboModel.addElement("YYYY-MM-DD 12:59:59 AM|PM");
+    LinuxFormatComboModel = LinuxFormatItem.createModel(false);
+    jComboBox1.setModel(LinuxFormatComboModel);
   }
 
   /**
@@ -60,7 +53,7 @@ public class LinuxDateFormat extends javax.swing.JDialog {
     jPanel3.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
     jLabel1.setLabelFor(jComboBox1);
-    jLabel1.setText("Select date format:");
+    jLabel1.setText(tr("linuxformat.select"));
     jPanel3.add(jLabel1);
 
     jComboBox1.setModel(LinuxFormatComboModel);
@@ -71,14 +64,14 @@ public class LinuxDateFormat extends javax.swing.JDialog {
 
     jPanel4.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-    jCheckBox1.setText("Always use this format");
+    jCheckBox1.setText(tr("linuxformat.remember"));
     jPanel4.add(jCheckBox1);
 
     jPanel1.add(jPanel4);
 
     getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
-    OkButton.setText("Ok");
+    OkButton.setText(tr("common.ok"));
     OkButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         OkButtonActionPerformed(evt);
@@ -102,7 +95,7 @@ public class LinuxDateFormat extends javax.swing.JDialog {
   }
 
   public String getDateFormat() {
-    return (String) jComboBox1.getSelectedItem();
+    return LinuxFormatItem.selectedValue(LinuxFormatComboModel);
   }
 
   public boolean isOk() {
@@ -118,6 +111,6 @@ public class LinuxDateFormat extends javax.swing.JDialog {
   private javax.swing.JPanel jPanel3;
   private javax.swing.JPanel jPanel4;
 
-  DefaultComboBoxModel<String> LinuxFormatComboModel = new DefaultComboBoxModel<>();
+  DefaultComboBoxModel<LinuxFormatItem> LinuxFormatComboModel = new DefaultComboBoxModel<>();
   boolean ok_to_proceed = false;
 }

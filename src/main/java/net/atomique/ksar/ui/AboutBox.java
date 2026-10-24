@@ -5,6 +5,8 @@
 
 package net.atomique.ksar.ui;
 
+import static net.atomique.ksar.I18n.tr;
+
 import net.atomique.ksar.VersionNumber;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +49,8 @@ public class AboutBox extends javax.swing.JDialog {
     authorlabel = new javax.swing.JLabel();
     licencelabel = new javax.swing.JLabel();
     tipslabel = new javax.swing.JLabel();
+    thankslabel = new javax.swing.JLabel();
+    upstreamlabel = new javax.swing.JLabel();
     jPanel1 = new javax.swing.JPanel();
     OkButton = new javax.swing.JButton();
 
@@ -56,7 +60,7 @@ public class AboutBox extends javax.swing.JDialog {
 
     jPanel3.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
 
-    versionlabel.setText("kSar version: " + VersionNumber.getVersionString());
+    versionlabel.setText(tr("about.version", VersionNumber.getVersionString()));
 
     javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
     jPanel3.setLayout(jPanel3Layout);
@@ -83,8 +87,8 @@ public class AboutBox extends javax.swing.JDialog {
 
     jPanel2.setLayout(new javax.swing.BoxLayout(jPanel2, javax.swing.BoxLayout.PAGE_AXIS));
 
-    String url = "https://github.com/vlsi/ksar";
-    urllabel.setText(String.format("<html>Website: <a href=\"%s\">%s</a></html>", url, url));
+    String url = "https://github.com/paguou329/ksar-jp";
+    urllabel.setText(tr("about.website", url));
     urllabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
     jPanel2.add(urllabel);
     openInBrowser(urllabel, url);
@@ -94,25 +98,34 @@ public class AboutBox extends javax.swing.JDialog {
     // the default branch.
     String version = VersionNumber.getVersionString();
     String ref = (version == null || version.endsWith("-SNAPSHOT")) ? "master" : "v" + version;
-    url = "https://github.com/vlsi/ksar/blob/" + ref + "/CONTRIBUTORS.md";
+    url = "https://github.com/paguou329/ksar-jp/blob/" + ref + "/CONTRIBUTORS.md";
     authorlabel.setText(
-        String.format("<html>Authors: <a href=\"%s\">CONTRIBUTORS.md</a></html>", url));
+        tr("about.authors", url));
     authorlabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
     jPanel2.add(authorlabel);
     openInBrowser(authorlabel, url);
 
-    licencelabel.setText("License: BSD-3-Clause (see LICENSE file)");
+    licencelabel.setText(tr("about.license"));
     jPanel2.add(licencelabel);
 
+    thankslabel.setText(tr("about.thanks"));
+    jPanel2.add(thankslabel);
+
+    url = "https://github.com/vlsi/ksar";
+    upstreamlabel.setText(tr("about.upstream", url));
+    upstreamlabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    jPanel2.add(upstreamlabel);
+    openInBrowser(upstreamlabel, url);
+
     url = "https://sourceforge.net/projects/ksar/";
-    tipslabel.setText(String.format("<html>Fork of: <a href=\"%s\">%s</a></html>", url, url));
+    tipslabel.setText(tr("about.fork", url));
     tipslabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
     jPanel2.add(tipslabel);
     openInBrowser(tipslabel, url);
 
     getContentPane().add(jPanel2);
 
-    OkButton.setText("Ok");
+    OkButton.setText(tr("common.ok"));
     OkButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
         OkButtonActionPerformed(evt);
@@ -155,7 +168,9 @@ public class AboutBox extends javax.swing.JDialog {
   private javax.swing.JPanel jPanel2;
   private javax.swing.JPanel jPanel3;
   private javax.swing.JLabel licencelabel;
+  private javax.swing.JLabel thankslabel;
   private javax.swing.JLabel tipslabel;
+  private javax.swing.JLabel upstreamlabel;
   private javax.swing.JLabel urllabel;
   private javax.swing.JLabel versionlabel;
 

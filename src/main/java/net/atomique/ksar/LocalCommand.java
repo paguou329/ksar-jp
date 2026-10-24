@@ -5,6 +5,8 @@
 
 package net.atomique.ksar;
 
+import static net.atomique.ksar.I18n.tr;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +26,7 @@ public class LocalCommand extends Thread {
   LocalCommand(kSar hissar) {
     mysar = hissar;
     try {
-      command = JOptionPane.showInputDialog(GlobalOptions.getUI(), "Enter local command ", "sar -A");
+      command = JOptionPane.showInputDialog(GlobalOptions.getUI(), tr("local.prompt"), "sar -A");
       if (command == null) {
         return;
       }
@@ -35,8 +37,8 @@ public class LocalCommand extends Thread {
       p = pb.start();
       in = p.getInputStream();
     } catch (Exception e) {
-      JOptionPane.showMessageDialog(GlobalOptions.getUI(), "There was a problem while running the command ",
-          "Local error", JOptionPane.ERROR_MESSAGE);
+      JOptionPane.showMessageDialog(GlobalOptions.getUI(), tr("local.error.message"),
+          tr("local.error.title"), JOptionPane.ERROR_MESSAGE);
       in = null;
     }
 
@@ -55,7 +57,7 @@ public class LocalCommand extends Thread {
     } catch (Exception e) {
       if (GlobalOptions.hasUI()) {
         JOptionPane.showMessageDialog(GlobalOptions.getUI(),
-            "There was a problem while running the command " + command, "Local error",
+            tr("local.error.message") + command, tr("local.error.title"),
             JOptionPane.ERROR_MESSAGE);
       } else {
         log.error("There was a problem while running the command {}", command);
